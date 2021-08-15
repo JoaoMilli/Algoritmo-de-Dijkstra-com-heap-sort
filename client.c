@@ -6,7 +6,7 @@
 #include "aresta.h"
 
 Item* retornaGporID(Item** vetor, int size, int ID);
-void relax(Item** pq, int N, int* map, Aresta* e, double** distTo, Aresta*** edgeTo);
+void relax(Item** pq, int* N, int* map, Aresta* e, double* distTo, Aresta** edgeTo);
 Item** leEntrada(char* path, Aresta*** edgeTo, int* nVert, int* nEdge, int* nServ, int* nClient, int* nMonitor);
 
 int main(int argc, char** argv) {
@@ -24,31 +24,36 @@ int main(int argc, char** argv) {
     free(endEdgeTo);
 
     distTo = malloc(sizeof(double)*nVert);
+    Aresta** todasArestas = malloc(sizeof(Aresta*) * nEdge);
+
     Item** pq = PQ_init(nVert, &map, &N);
 
     for(v=0; v<nVert; v++){
         if(retornaTipo(retornaGporID(listaV, nVert, v)) == 1){
             distTo[v] = 0;
-            PQ_insert(pq, retornaGporID(listaV, nVert, v), &N, &map, 0.0);
+            PQ_insert(pq, retornaGporID(listaV, nVert, v), &N, map, 0.0);
         }
         else distTo[v] = DBL_MAX;
     }
 
+
     // removendo o menor elemento e imprimindo
     while (!PQ_empty(&N)) {
-        Item* p = PQ_delmin(pq, &map, &N);
+        Item* p = PQ_delmin(pq, map, &N);
         for(v=0; v<nEdge; v++){
             if (apontaPara(edgeTo[v], p)){
-                relax(pq, N, map, edgeTo[v], &distTo, &edgeTo);
+                if(!relaxed(edgeTo[v])){
+                    relax(pq, &N, map, edgeTo[v], distTo, todasArestas);
+                }
             }
         }
-        printf("Identificador %d, prioridade %lf\n", id(p), value(p));
+        printf("Identificador %d, distancia %lf\n", id(p), value(p));
     }
 }
 
-int PQ_contains(Item** pq, int N, int ID){
+int PQ_contains(Item** pq, int* N, int ID){
     int i;
-    for (i=0; i<N; i++){
+    for (i=1; i<=*N; i++){
         if (returnID(pq[i]) == ID) return 1;
     }
     return 0;
@@ -113,22 +118,23 @@ Item** leEntrada(char* path, Aresta*** edgeTo, int* nVert, int* nEdge, int* nSer
 
 }
 
-void relax(Item** pq, int N, int* map, Aresta* e, double** distTo, Aresta*** edgeTo){
+void relax(Item** pq, int* N, int* map, Aresta* e, double* distTo, Aresta** edgeTo){
     Item* itv = retornaFrom(e);
     Item* itw = retornaTo(e);
     int v = returnID(itv);
     int w = returnID(itw);
 
-    if((*distTo)[w] > ((*distTo)[v] + retornaWeight(e))){
-        (*distTo)[w] = (*distTo)[v] + retornaWeight(e);
-        (*edgeTo)[w] = e;
+    if(distTo[w] > (distTo[v] + retornaWeight(e))){
+        distTo[w] = distTo[v] + retornaWeight(e);
+        edgeTo[w] = e;
         if(PQ_contains(pq, N, w)){
-            PQ_decrease_key(pq, w, &map, (*distTo)[w]);
+            PQ_decrease_key(pq, w, map, distTo[w]);
         }
         else{
-            PQ_insert(pq, itw, &N, &map, (*distTo)[w]);
+            PQ_insert(pq, itw, N, map, distTo[w]);
         }
     }
+    relaxEdge(e);
 }
 
 Item* retornaGporID(Item** vetor, int size, int ID){

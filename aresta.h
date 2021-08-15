@@ -11,5 +11,7 @@ int apontaPara(Aresta* a, Item* to);
 Item* retornaFrom(Aresta* a);
 Item* retornaTo(Aresta* a);
 double retornaWeight(Aresta* a);
+int relaxed(Aresta* a);
+void relaxEdge(Aresta* a);
 
 #endif
