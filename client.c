@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <float.h>
 #include "PQ.h"
-#include "item.h"
+#include "rtt.h"
+#include "item.h" 
 #include "aresta.h"
+#include "dijkstra.h"
 
-Item* retornaGporID(Item** vetor, int size, int ID);
-void relax(Item** pq, int* N, int* map, Aresta* e, double* distTo, Aresta** edgeTo);
 Item** leEntrada(char* path, Aresta*** edgeTo, int* nVert, int* nEdge, int* nServ, int* nClient, int* nMonitor);
+void liberaMemoria(Aresta*** endEdgeTo, double* distTo, Aresta** todasArestas, int nVert, int nEdge);
 
 int main(int argc, char** argv) {
 
@@ -21,42 +22,109 @@ int main(int argc, char** argv) {
 
     Aresta** edgeTo = *endEdgeTo;
 
-    free(endEdgeTo);
 
     distTo = malloc(sizeof(double)*nVert);
     Aresta** todasArestas = malloc(sizeof(Aresta*) * nEdge);
 
-    Item** pq = PQ_init(nVert, &map, &N);
+    //dijkstra(nVert, map, N, listaV, v,  distTo, nEdge, edgeTo, todasArestas,1);
+    
+    // free(endEdgeTo);
+    // free(distTo);
+    // for(int i=0; i < nVert; i++){
+    //     free(listaV[i]);
+    // }
+    // free(todasArestas);
+    // free(listaV);
 
-    for(v=0; v<nVert; v++){
-        if(retornaTipo(retornaGporID(listaV, nVert, v)) == 1){
-            distTo[v] = 0;
-            PQ_insert(pq, retornaGporID(listaV, nVert, v), &N, map, 0.0);
-        }
-        else distTo[v] = DBL_MAX;
-    }
+    //liberaMemoria(endEdgeTo, distTo, todasArestas, nVert, nEdge);
 
+    // RTT
 
-    // removendo o menor elemento e imprimindo
-    while (!PQ_empty(&N)) {
-        Item* p = PQ_delmin(pq, map, &N);
-        for(v=0; v<nEdge; v++){
-            if (apontaPara(edgeTo[v], p)){
-                if(!relaxed(edgeTo[v])){
-                    relax(pq, &N, map, edgeTo[v], distTo, todasArestas);
-                }
+    /*Lista de RTTs com tamanho para todas as combinações servidores/clientes*/    
+    RTT **listaRTT = malloc(sizeof(RTT*) * (nServ * nClient));
+    int k =0; 
+
+    for(int i=0; i<nVert; i++){
+        if(retornaTipo(listaV[i]) == 1) {
+            dijkstra(nVert, map, N, listaV, distTo, nEdge, edgeTo, todasArestas, returnID(listaV[i])); 
+
+            //Distancia servidor-cliente
+            for(int j=0; j<nVert; j++){
+                if(retornaTipo(listaV[j]) == 2){
+                    double ida = distTo[returnID(listaV[j])];
+                    dijkstra(nVert, map, N, listaV, distTo, nEdge, edgeTo, todasArestas, returnID(listaV[j]));
+                    double volta = distTo[returnID(listaV[i])];
+                    printf("ida %f volta %f\n", ida, volta);
+                    RTT *rtt = CriaRTT(listaV, nVert ,ida, volta,returnID(listaV[i]),returnID(listaV[j]));
+                    listaRTT[k] = rtt;
+                    k++;
+                } 
             }
         }
-        printf("Identificador %d, distancia %lf\n", id(p), value(p));
     }
-}
 
-int PQ_contains(Item** pq, int* N, int ID){
-    int i;
-    for (i=1; i<=*N; i++){
-        if (returnID(pq[i]) == ID) return 1;
+    // RTT*
+    /*                     S -> M      M -> C  S -> M      M -> C
+    RTT∗ (0, 4) = min{RTT(0, 1) + RTT(1, 4), RTT(0, 2) + RTT(2, 4)}
+                = min{20 + 20, 19 + 10}
+                = min{40, 29}
+                = 29
+*/
+
+    // RTT (S->M)
+
+    for(int i=0; i<nVert; i++){
+        if(retornaTipo(listaV[i]) == 1) {
+            dijkstra(nVert, map, N, listaV, distTo, nEdge, edgeTo, todasArestas, returnID(listaV[i])); 
+
+            //Distancia servidor-cliente
+            for(int j=0; j<nVert; j++){
+                if(retornaTipo(listaV[j]) == 3){
+                    double ida = distTo[returnID(listaV[j])];
+                    dijkstra(nVert, map, N, listaV, distTo, nEdge, edgeTo, todasArestas, returnID(listaV[j]));
+                    double volta = distTo[returnID(listaV[i])];
+                    printf("ida %f volta %f\n", ida, volta);
+                    RTT *rtt = CriaRTT(listaV, nVert ,ida, volta,returnID(listaV[i]),returnID(listaV[j]));
+                    listaRTT[k] = rtt;
+                    k++;
+                } 
+            }
+        }
     }
-    return 0;
+
+     for(k=0; k < 3; k++){
+        imprimeRTT(listaRTT[k]); 
+        printf("--\n");    
+    }
+    printf("\n");
+
+
+    // RTT (M -> C)
+
+    for(int i=0; i<nVert; i++){
+        if(retornaTipo(listaV[i]) == 3) {
+            dijkstra(nVert, map, N, listaV, distTo, nEdge, edgeTo, todasArestas, returnID(listaV[i])); 
+
+            //Distancia servidor-cliente
+            for(int j=0; j<nVert; j++){
+                if(retornaTipo(listaV[j]) == 2){
+                    double ida = distTo[returnID(listaV[j])];
+                    dijkstra(nVert, map, N, listaV, distTo, nEdge, edgeTo, todasArestas, returnID(listaV[j]));
+                    double volta = distTo[returnID(listaV[i])];
+                    //printf("ida %f volta %f\n", ida, volta);
+                    RTT *rtt = CriaRTT(listaV, nVert ,ida, volta,returnID(listaV[i]),returnID(listaV[j]));
+                    listaRTT[k] = rtt;
+                    k++;
+                } 
+            }
+        }
+    }    
+
+    for(k=0; k < 5; k++){
+        imprimeRTT(listaRTT[k]); 
+        printf("--\n");    
+    }
+
 }
 
 Item** leEntrada(char* path, Aresta*** edgeTo, int* nVert, int* nEdge, int* nServ, int* nClient, int* nMonitor){
@@ -118,29 +186,13 @@ Item** leEntrada(char* path, Aresta*** edgeTo, int* nVert, int* nEdge, int* nSer
 
 }
 
-void relax(Item** pq, int* N, int* map, Aresta* e, double* distTo, Aresta** edgeTo){
-    Item* itv = retornaFrom(e);
-    Item* itw = retornaTo(e);
-    int v = returnID(itv);
-    int w = returnID(itw);
-
-    if(distTo[w] > (distTo[v] + retornaWeight(e))){
-        distTo[w] = distTo[v] + retornaWeight(e);
-        edgeTo[w] = e;
-        if(PQ_contains(pq, N, w)){
-            PQ_decrease_key(pq, w, map, distTo[w]);
-        }
-        else{
-            PQ_insert(pq, itw, N, map, distTo[w]);
-        }
-    }
-    relaxEdge(e);
-}
-
-Item* retornaGporID(Item** vetor, int size, int ID){
-    int i;
-    for(i=0; i<size; i++){
-        if(returnID(vetor[i]) == ID) return vetor[i];
-    }
-    return NULL;
+void liberaMemoria(Aresta*** endEdgeTo, double* distTo, Aresta** todasArestas, int nVert, int nEdge){
+    free(distTo);
+    // for(int i=0; i<nVert; i++){
+        
+    // }
+    // for(int j=0; j<nEdge; j++){
+    //     free(todasArestas[j]);
+    // }
+    free(todasArestas);
 }

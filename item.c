@@ -38,3 +38,11 @@ void destroiItem(Item* item){
 int retornaTipo(Item* item){
     return item->tipo;
 }
+
+Item* retornaGporID(Item** vetor, int size, int ID){
+    int i;
+    for(i=0; i<size; i++){
+        if(returnID(vetor[i]) == ID) return vetor[i];
+    }
+    return NULL;
+};

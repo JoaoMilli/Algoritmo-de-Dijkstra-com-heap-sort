@@ -13,5 +13,6 @@ Item* retornaTo(Aresta* a);
 double retornaWeight(Aresta* a);
 int relaxed(Aresta* a);
 void relaxEdge(Aresta* a);
+void desrelaxar(Aresta * a);
 
 #endif

@@ -18,6 +18,10 @@ Aresta* criaAresta(Item* from, Item* to, double weight){
     return a;
 }
 
+void desrelaxar(Aresta * a){
+    a->relaxed = 0;
+}
+
 int apontaPara (Aresta* a, Item* to){
     return (returnID(a->from) == returnID(to));
 }
