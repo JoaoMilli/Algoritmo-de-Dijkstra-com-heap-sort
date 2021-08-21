@@ -51,12 +51,13 @@ void dijkstra(int nVert, int *map, int N, Item** listaV, double* distTo,int nEdg
                 }
             }
         }
-        printf("Identificador %d, distancia %lf\n", id(p), value(p));
+        // printf("Identificador %d, distancia %lf\n", id(p), value(p));
     }
 
-    for(int i=0; i < nVert; i++){
-        //printf("distTo[%d] - dentro do dijkstra %.2f\n",i, distTo[i]);
-    }
+    // for(int i=0; i < nVert; i++){
+    //     printf("distTo[%d] - dentro do dijkstra %.2f\n",i, distTo[i]);
+    // }
+    // printf("\n\n");
 }
 
 int PQ_contains(Item** pq, int* N, int ID){

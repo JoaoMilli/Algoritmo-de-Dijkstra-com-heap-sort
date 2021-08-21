@@ -18,9 +18,20 @@ RTT* CriaRTT(Item **vetor, int size, double ida, double volta, int i, int j){
     return rtt;
 }
 
-void imprimeRTT(RTT *rtt){
-    //printf("%f\n", rtt->ida);
-    //printf("%f\n", rtt->volta);
-    printf("%f\n",rtt->ida + rtt->volta);
+Item* retornaIdaRTT(RTT * rtt){
+    return rtt->no1;
 }
 
+Item* retornaVoltaRTT(RTT * rtt){
+    return rtt->no2;
+}
+
+
+void imprimeRTT(RTT *rtt){
+    //printf("RTT(%d, %d)\nIda: %f\nVolta:%f\n", returnID(rtt->no1), returnID(rtt->no2), rtt->ida, rtt->volta);
+    printf("%f\n", rtt->ida + rtt->volta);
+}
+
+double retornaDistancia(RTT *rtt){
+    return (rtt->ida + rtt->volta);
+}
