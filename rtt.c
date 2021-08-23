@@ -29,7 +29,7 @@ Item* retornaVoltaRTT(RTT * rtt){
 
 void imprimeRTT(RTT *rtt){
     //printf("RTT(%d, %d)\nIda: %f\nVolta:%f\n", returnID(rtt->no1), returnID(rtt->no2), rtt->ida, rtt->volta);
-    printf("%f\n", rtt->ida + rtt->volta);
+    printf("(%d, %d) ida: %f volta:%f soma:%f\n", returnID(rtt->no1), returnID(rtt->no2), rtt->ida , rtt->volta,rtt->ida + rtt->volta);
 }
 
 double retornaDistancia(RTT *rtt){
