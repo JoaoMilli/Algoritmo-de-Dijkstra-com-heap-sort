@@ -31,7 +31,7 @@ void dijkstra(int nVert, int *map, int N, Item** listaV, double* distTo,int nEdg
         //if(retornaTipo(retornaGporID(listaV, nVert, v)) == ID){
         if (returnID(listaV[v]) == ID){
             distTo[ID] = 0;
-            PQ_insert(pq, retornaGporID(listaV, nVert, ID), &N, map, 0.0);
+            PQ_insert(pq, listaV[v], &N, map, 0.0);
         }
         else distTo[returnID(listaV[v])] = DBL_MAX;
     }

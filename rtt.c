@@ -9,12 +9,12 @@ struct rtt {
     Item *no2;
 };
 
-RTT* CriaRTT(Item **vetor, int size, double ida, double volta, int i, int j){
+RTT* CriaRTT(Item **vetor, int size, double ida, double volta, Item* no1, Item* no2){
     RTT *rtt = (RTT*)malloc(sizeof(RTT));
     rtt->ida = ida;
     rtt->volta = volta;
-    rtt->no1 = retornaGporID(vetor,size,i);
-    rtt->no2 = retornaGporID(vetor,size,j);
+    rtt->no1 = no1;
+    rtt->no2 = no2;
     return rtt;
 }
 
