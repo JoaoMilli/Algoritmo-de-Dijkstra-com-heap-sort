@@ -1,16 +1,20 @@
 #ifndef RTT_H
 #define RTT_H
 #include "item.h"
+#include "graph.h"
 
 typedef struct rtt RTT;
 
-RTT* CriaRTT(Item** vetor, int size,double ida, double volta, Item* no1, Item* no2);
+RTT* CriaRTT( int idno1, int  idno2, double valor);
 
 void imprimeRTT(RTT *rtt);
 
-Item * retornaIdaRTT(RTT * rtt);
+int retornaIdaRTT(RTT * rtt);
 
-Item * retornaVoltaRTT(RTT * rtt);
+int retornaVoltaRTT(RTT * rtt);
 
 double retornaDistancia(RTT *rtt);
+
+Item * calculaRTT(Graph *graph,int nVert, int nServ, int nClient, int nMonitor);
+
 #endif

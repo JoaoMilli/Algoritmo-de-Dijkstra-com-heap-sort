@@ -3,6 +3,8 @@
 #include "PQ.h"
 #include "item.h"
 
+
+
 void swap(Item **pq, int* map, int i, int j) {
     exch(pq[i], pq[j]);
     map[id(pq[i])] = i;
@@ -46,6 +48,14 @@ void PQ_insert(Item **pq, Item* v, int* N, int* map, double value) {
     map[id(v)] = *N;
 
     fix_up(pq, map, *N);
+}
+
+int PQ_contains(Item** pq, int* N, int ID){
+    int i;
+    for (i=1; i<=*N; i++){
+        if (returnID(pq[i]) == ID) return 1;
+    }
+    return 0;
 }
 
 Item* PQ_delmin(Item **pq, int* map, int* N) {

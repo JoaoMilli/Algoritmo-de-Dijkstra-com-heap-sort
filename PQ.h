@@ -12,5 +12,5 @@ Item* PQ_min(Item **pq);          // Retorna Item com menor campo 'value' da PQ
 bool PQ_empty(int* N);      // Retorna True se a PQ não tem elementos
 int PQ_size(int* N);         // Número de elementos na PQ
 void PQ_finish(Item **pq, int *N, int* map);       // Libera memória
-
+int PQ_contains(Item** pq, int* N, int ID);
 #endif

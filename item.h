@@ -8,7 +8,7 @@ typedef struct item Item;
 #define more(A, B)      (value(A) > value(B))           // compara nós, por valor
 #define exch(A, B)      { Item* t = A; A = B; B = t; }   // troca dois nós
 
-Item* make_item(int id, double value, int tipo);
+Item* make_item(int id, double value);
 Item* retornaGporID(Item** vetor, int size, int ID);
 int returnID(Item* item);
 void modificaID(Item* item, int ID);
@@ -16,5 +16,6 @@ double returnValue(Item* item);
 void modificaValue(Item* item, double value);
 void destroiItem(Item* item);
 int retornaTipo(Item* item);
+Item * alocaItem(int nServ, int nClient);
 
 #endif

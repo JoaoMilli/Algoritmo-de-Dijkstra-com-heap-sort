@@ -7,11 +7,16 @@ struct item{
   int tipo;
 };
 
-Item* make_item(int id, double value, int tipo) {
+Item* make_item(int id, double value) {
     Item* t = malloc(sizeof(Item));
     modificaID(t, id);
     modificaValue(t, value);
-    t->tipo=tipo;
+    // t->tipo=tipo;
+    return t;
+}
+
+Item * alocaItem(int nServ, int nClient){
+    Item * t = (Item*)malloc(sizeof(Item) * nServ * nClient);
     return t;
 }
 
@@ -46,3 +51,4 @@ Item* retornaGporID(Item** vetor, int size, int ID){
     }
     return NULL;
 };
+

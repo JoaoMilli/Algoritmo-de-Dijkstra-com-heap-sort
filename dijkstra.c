@@ -1,69 +1,52 @@
-#include "dijkstra.h"
-#include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "dijkstra.h"
+#include "float.h"
+#include "PQ.h"
 
-void relax(Item** pq, int* N, int* map, Aresta* e, double* distTo, Aresta** edgeTo){
-    Item* itv = retornaFrom(e);
-    Item* itw = retornaTo(e);
-    int v = returnID(itv);
-    int w = returnID(itw);
 
-    if(distTo[w] > (distTo[v] + retornaWeight(e))){
-        distTo[w] = distTo[v] + retornaWeight(e);
-        edgeTo[w] = e;
-        if(PQ_contains(pq, N, w)){
-            PQ_decrease_key(pq, w, map, distTo[w]);
-        }
-        else{
-            PQ_insert(pq, itw, N, map, distTo[w]);
-        }
-    }
-    relaxEdge(e);
-};
+void dijkstra(Graph *graph, int src, double *dist)
+{
+	int V = retornaVertice(graph);
 
-void dijkstra(int nVert, int *map, int N, Item** listaV, double* distTo,int nEdge, Aresta** edgeTo,Aresta** todasArestas, int ID){
-    Item** pq = PQ_init(nVert, &map, &N);
-    for(int i =0; i <nEdge; i++){
-        desrelaxar(edgeTo[i]);
-    }
-    for(int v=0; v<nVert; v++){
-        //if(retornaTipo(retornaGporID(listaV, nVert, v)) == ID){
-        if (returnID(listaV[v]) == ID){
-            distTo[ID] = 0;
-            PQ_insert(pq, listaV[v], &N, map, 0.0);
-        }
-        else distTo[returnID(listaV[v])] = DBL_MAX;
-    }
+	int *map, N;
+	
+	Item **pq = PQ_init(V,&map, &N);
 
-    // RTT(a, b) = δ(a, b) + δ(b, a).
+	for (int v = 0; v < V; ++v)
+	{
+		dist[v] = DBL_MAX;
 
-    // removendo o menor elemento e imprimindo
-    while (!PQ_empty(&N)) {
-        Item* p = PQ_delmin(pq, map, &N);
-        
-        for(int v=0; v<nEdge; v++){
-            if (apontaPara(edgeTo[v], p)){
-          
-                if(!relaxed(edgeTo[v])){
-                   
-                    relax(pq, &N, map, edgeTo[v], distTo, todasArestas);
-                }
-            }
-        }
-        //printf("Identificador %d, distancia %lf\n", id(p), value(p));
-    }
+		Item * item = make_item(v, dist[v]);
+		PQ_insert(pq, item, &N, map, dist[v]);
 
-    // for(int i=0; i < nVert; i++){
-    //     printf("distTo[%d] - dentro do dijkstra %.2f\n",i, distTo[i]);
-    // }
-    // printf("\n\n");
-}
+	}
 
-int PQ_contains(Item** pq, int* N, int ID){
-    int i;
-    for (i=1; i<=*N; i++){
-        if (returnID(pq[i]) == ID) return 1;
-    }
-    return 0;
+	PQ_decrease_key(pq, src, map, 0.0);
+	dist[src] = 0;
+
+	while (!PQ_empty(&N))
+	{
+		Item *item = PQ_delmin(pq, map, &N);
+
+		int u = returnID(item);
+
+		AdjListNode *pCrawl = getHead(graph,u);
+		
+		while (pCrawl != NULL)
+		{
+			int v = getDest(pCrawl);
+
+			if (PQ_contains(pq, &N, v) && dist[u] != DBL_MAX && getWeight(pCrawl) + dist[u] < dist[v])
+			{
+			
+				dist[v] = dist[u] + getWeight(pCrawl);
+			
+				PQ_decrease_key(pq, v, map, dist[v]);
+			}
+			pCrawl = getNext(pCrawl);
+		}
+	}
+	PQ_finish(pq, &N, map);
+
 }
