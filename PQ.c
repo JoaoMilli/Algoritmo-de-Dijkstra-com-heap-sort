@@ -58,6 +58,10 @@ int PQ_contains(Item** pq, int* N, int ID){
     return 0;
 }
 
+int PQ_buscaVertice(Item ** pq,int *map, int vertice, int *N){
+    return map[vertice] <= (*N);
+}
+
 Item* PQ_delmin(Item **pq, int* map, int* N) {
     Item* min = pq[1];
     swap(pq, map, 1, *N);

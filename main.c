@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "graph.h"
 #include "item.h"
+#include "dijkstra.h"
 #include "rtt.h"
 
 void leParametros(FILE *file, int *nVert, int *nEdge, int *nServ, int *nClient, int *nMonitor)
@@ -17,11 +18,9 @@ Graph *leEntrada(FILE *file, int *servidor, int *cliente, int *monitor, int *v, 
 {
 	int aux, aux_id1, aux_id2, j;
 	double aux_weight;
-
 	//  Inicializar a matriz como -1, melhorar dps
 	for (int i = 0; i < *nVert; i++)
 	{
-
 		dadosVertice[i][0] = -1;
 	}
 
@@ -62,7 +61,7 @@ Graph *leEntrada(FILE *file, int *servidor, int *cliente, int *monitor, int *v, 
 
 	// Inicializar o Grafo
 	graph = createGraph(*nVert, *nEdge, servidor, cliente, monitor, v);
-	// printGraph(graph);
+	
 	// Ler as arestas
 	for (int i = 0; i < *nEdge; i++)
 	{
@@ -89,7 +88,7 @@ Graph *leEntrada(FILE *file, int *servidor, int *cliente, int *monitor, int *v, 
 			aux++;
 		}
 
-		//Cria a aresta no grafo
+		// Cria a aresta no grafo
 		addEdge(graph, dadosVertice[aux_id1][0], dadosVertice[aux_id2][0], aux_weight, dadosVertice[aux_id1][1], dadosVertice[aux_id2][1]);
 	}
 
@@ -106,22 +105,28 @@ int main(int argc, char **argv)
 
 	FILE *file = fopen(path, "r");
 
+	// Leitura dos parametros
 	leParametros(file, &nVert, &nEdge, &nServ, &nClient, &nMonitor);
+
 	Graph *graph;
-	int *v = (int *)malloc(sizeof(int) * 10000);
+
+	int *v = (int *)malloc(sizeof(int) * nVert);
 	int *servidor = (int *)malloc(sizeof(int) * nServ);
 	int *cliente = (int *)malloc(sizeof(int) * nClient);
 	int *monitor = (int *)malloc(sizeof(int) * nMonitor);
 
-	//Matrix com os ids e tipo dos elementos
+	// Matriz com os ids e tipo dos elementos
 	int dadosVertice[nVert][2];
 
+	// Leitura da entrada
 	graph = leEntrada(file, servidor, cliente, monitor, v, dadosVertice, graph, &nVert, &nEdge, &nServ, &nClient, &nMonitor);
-	//printGraph(graph, nServ, nClient, nMonitor);
-
+	
+	// Calcula o resultado
 	RTT *result = calculaRTT(graph, nVert, nServ, nClient, nMonitor);
 
+	// Abertura do arquivo de saida
 	FILE *outputFile = fopen(pathOutput, "w");
 
+	// Imprime o arquivo de saída
 	imprimeListaRTT(outputFile, result, nClient * nServ);
 }

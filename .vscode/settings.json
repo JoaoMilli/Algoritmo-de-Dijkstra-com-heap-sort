@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "item.h": "c",
-        "graph.h": "c"
+        "graph.h": "c",
+        "dijkstra.h": "c"
     }
 }
