@@ -2,19 +2,28 @@
 #define RTT_H
 #include "item.h"
 #include "graph.h"
+#include "dijkstra.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <float.h>
 
 typedef struct rtt RTT;
 
-RTT* CriaRTT( int idno1, int  idno2, double valor);
+RTT *CriaRTT(int idno1, int idno2, double valor);
 
 void imprimeRTT(RTT *rtt);
 
-int retornaIdaRTT(RTT * rtt);
+void imprimeListaRTT(FILE *file, RTT *lista, int tam);
 
-int retornaVoltaRTT(RTT * rtt);
+int retornaIdaRTT(RTT *rtt);
+
+int retornaVoltaRTT(RTT *rtt);
 
 double retornaDistancia(RTT *rtt);
 
-Item * calculaRTT(Graph *graph,int nVert, int nServ, int nClient, int nMonitor);
+RTT *calculaRTT(Graph *graph, int nVert, int nServ, int nClient, int nMonitor);
+
+double **criaMatriz(Graph *graph, int tam, int *src, int *d1, int *d2, int nd1, int nd2);
 
 #endif

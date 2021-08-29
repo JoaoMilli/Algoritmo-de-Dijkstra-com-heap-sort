@@ -4,6 +4,5 @@
 #include "graph.h"
 #include "item.h"
 
-void dijkstra(Graph *graph, int src, double *dist);
-
+double *dijkstra(Graph *graph, int src, int *d1, int *d2, int nd1, int nd2);
 #endif
