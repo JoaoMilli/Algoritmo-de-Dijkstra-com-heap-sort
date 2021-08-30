@@ -11,7 +11,6 @@ Item* make_item(int id, double value) {
     Item* t = malloc(sizeof(Item));
     modificaID(t, id);
     modificaValue(t, value);
-    // t->tipo=tipo;
     return t;
 }
 

@@ -91,9 +91,14 @@ Graph *leEntrada(FILE *file, int *servidor, int *cliente, int *monitor, int *v, 
 		// Cria a aresta no grafo
 		addEdge(graph, dadosVertice[aux_id1][0], dadosVertice[aux_id2][0], aux_weight, dadosVertice[aux_id1][1], dadosVertice[aux_id2][1]);
 	}
-
-	fclose(file);
 	return graph;
+}
+
+void destroiSCM(int * servidor, int *cliente, int *monitor, int *v){
+	free(v);
+	free(servidor);
+	free(cliente);
+	free(monitor);
 }
 
 int main(int argc, char **argv)
@@ -120,7 +125,7 @@ int main(int argc, char **argv)
 
 	// Leitura da entrada
 	graph = leEntrada(file, servidor, cliente, monitor, v, dadosVertice, graph, &nVert, &nEdge, &nServ, &nClient, &nMonitor);
-	
+
 	// Calcula o resultado
 	RTT *result = calculaRTT(graph, nVert, nServ, nClient, nMonitor);
 
@@ -129,4 +134,14 @@ int main(int argc, char **argv)
 
 	// Imprime o arquivo de saída
 	imprimeListaRTT(outputFile, result, nClient * nServ);
+	
+	// Libera toda a memoria alocada
+	// Graph, SCM, arquivos e result- OK
+	// As matrizes de dist que tão vazando
+	destroiListaRTT(result);
+
+	destroiGraph(graph);
+	destroiSCM(servidor, cliente, monitor,v);
+	fclose(file);
+	fclose(outputFile);
 }

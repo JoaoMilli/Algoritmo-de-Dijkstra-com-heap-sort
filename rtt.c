@@ -31,10 +31,6 @@ void imprimeRTT(RTT *rtt)
     printf("%d %d %.16lf\n", rtt->idno1, rtt->idno2, rtt->valor);
 }
 
-RTT *somaRTT(RTT *rtt1, RTT *rtt2)
-{
-}
-
 static int compare(const void *a, const void *b)
 {
     RTT a1 = *(RTT *)a;
@@ -120,6 +116,9 @@ RTT *calculaRTT(Graph *graph, int nVert, int nServ, int nClient, int nMonitor)
 
     qsort(lista, nServ * nClient, sizeof(RTT), compare);
 
+    destroiMatriz(dists_servers, n_servers);
+    destroiMatriz(dists_clients, n_clients);
+    destroiMatriz(dists_monitors, n_monitors);
     return lista;
 }
 
@@ -143,4 +142,13 @@ double **criaMatriz(Graph *graph, int tam, int *src, int *d1, int *d2, int nd1, 
     return dists;
 }
 
+void destroiMatriz(double ** matriz, int l){
+    for(int i=0; i<l; i++){
+        free(matriz[i]);
+    }
+    free(matriz);
+}
 
+void destroiListaRTT(RTT *lista){
+    free(lista);
+}

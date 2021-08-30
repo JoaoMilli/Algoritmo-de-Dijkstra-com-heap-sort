@@ -26,4 +26,8 @@ RTT *calculaRTT(Graph *graph, int nVert, int nServ, int nClient, int nMonitor);
 
 double **criaMatriz(Graph *graph, int tam, int *src, int *d1, int *d2, int nd1, int nd2);
 
+void destroiMatriz(double ** matriz, int l);
+
+void destroiListaRTT(RTT *lista);
+
 #endif
