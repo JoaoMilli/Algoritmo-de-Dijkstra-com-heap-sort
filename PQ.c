@@ -48,6 +48,10 @@ void PQ_insert(Item **pq, Item* v, int* N, int* map, double value) {
     fix_up(pq, map, *N);
 }
 
+int PQ_buscaVertice(Item ** pq,int *map, int vertice, int *N){
+    return map[vertice] <= (*N);
+}
+
 Item* PQ_delmin(Item **pq, int* map, int* N) {
     Item* min = pq[1];
     swap(pq, map, 1, *N);
