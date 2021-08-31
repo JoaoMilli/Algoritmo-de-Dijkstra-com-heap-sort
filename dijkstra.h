@@ -7,8 +7,14 @@
 #include <stdlib.h>
 #include <float.h>
 
-typedef struct rtt RTT;
+/*
+*  Algoritmo de Dijkstra implementado com heap
+*  inputs: um graph, um inteiro indicando a origem, dois ponteiros de inteiro 
+*  indicando os dois grupos (servidores, clientes ou monitores)  e os tamanhos
+*  output: retorna um ponteiro de double com as distancias
+*  pre-condicao: O Graph e os ponteiros de inteiro devem estar devidamente inicializados
+*/
 
-double *dijkstra(Graph *graph, int src, int *d1, int *d2, int nd1, int nd2);
+double *dijkstra(Graph *graph, int src);
 
 #endif

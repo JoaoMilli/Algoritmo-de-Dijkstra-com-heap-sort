@@ -11,7 +11,6 @@ Item* make_item(int id, double value) {
     Item* t = malloc(sizeof(Item));
     modificaID(t, id);
     modificaValue(t, value);
-    // t->tipo=tipo;
     return t;
 }
 
@@ -44,11 +43,4 @@ int retornaTipo(Item* item){
     return item->tipo;
 }
 
-Item* retornaGporID(Item** vetor, int size, int ID){
-    int i;
-    for(i=0; i<size; i++){
-        if(returnID(vetor[i]) == ID) return vetor[i];
-    }
-    return NULL;
-};
 

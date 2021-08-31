@@ -30,11 +30,12 @@ void imprimeRTT(RTT *rtt)
 {
     printf("%d %d %.16lf\n", rtt->idno1, rtt->idno2, rtt->valor);
 }
-
-RTT *somaRTT(RTT *rtt1, RTT *rtt2)
-{
-}
-
+/*
+*  Função usada pelo qsort para comparar
+*  inputs: O ponteiro para RTT
+*  output: retorna um inteiro
+*  pre-condicao: nenhuma
+*/
 static int compare(const void *a, const void *b)
 {
     RTT a1 = *(RTT *)a;
@@ -63,63 +64,76 @@ RTT *calculaRTT(Graph *graph, int nVert, int nServ, int nClient, int nMonitor)
     int *clients = retornaCliente(graph);
     int *servers = retornaServidor(graph);
     int *monitors = retornaMonitor(graph);
-    int n_clients = nClient;
-    int n_servers = nServ;
-    int n_monitors = nMonitor;
     int count = 0;
 
     RTT *lista = malloc(sizeof(RTT) * (nServ * nClient));
 
+    /* Executa o algoritmo de Djikstra e calcula as distancia dos servidores, clientes e monitores */
 
-    double **dists_clients = criaMatriz(graph, n_clients, clients, servers, monitors, nServ, nMonitor);
-	for(int i=0; i < n_clients; i++){
-        dists_clients[i] = dijkstra(graph, clients[i], servers, monitors, nServ, nMonitor);
-	}
+    // /* Servidor */
+    double **distsServers = criaMatriz(graph, nServ);
+    for (int i = 0; i < nServ; i++)
+    {
+        distsServers[i] = dijkstra(graph, servers[i]);
+    }
 
-    double **dists_servers = criaMatriz(graph, n_servers, servers, clients, monitors, nClient, nMonitor);
-	for(int i=0; i < n_servers; i++){
-		dists_servers[i] = dijkstra(graph, servers[i], clients, monitors, nClient, nMonitor);
-	}
+    /* Clientes */
+    double **distsClients = criaMatriz(graph, nClient);
+    for (int i = 0; i < nClient; i++)
+    {
+        distsClients[i] = dijkstra(graph, clients[i]);
+    }
 
-    double **dists_monitors = criaMatriz(graph, n_monitors, monitors, servers, clients, nServ, nClient);
-	for(int i=0; i < n_monitors; i++){
-		dists_monitors[i] = dijkstra(graph, monitors[i], servers, clients, nServ, nClient);
-	}
-    printf("FINALIZE DJK\n");
+    /* Monitores */
+    double **distsMonitors = criaMatriz(graph, nMonitor);
+    for (int i = 0; i < nMonitor; i++)
+    {
+        distsMonitors[i] = dijkstra(graph, monitors[i]);
+    }
+    // printf("FINALIZE DJK\n");
 
-    // ----- Calculando os rtts a partirdo retorn dist
-    double rtt_cs, rtt1, rtt2, rtt_m, rtt_min, rtt_ratio;
+    /* Calculando os RTTS */
+
+    double rttSc, rtt1, rtt2, rttAst, rttMin, rttFinal;
 
     for (int i = 0; i < nServ; i++)
     {
         for (int j = 0; j < nClient; j++)
         {
-            rtt_cs = dists_servers[i][clients[j]] + dists_clients[j][servers[i]];
-            rtt_m = DBL_MAX;
-            for (int k = 0; k < n_monitors; k++)
+            rttSc = distsServers[i][clients[j]] + distsClients[j][servers[i]];
+            // Definindo como o maior possivel para usar na comparação
+            rttAst = DBL_MAX;
+            for (int k = 0; k < nMonitor; k++)
             {
-                rtt1 = dists_servers[i][monitors[k]] + dists_monitors[k][servers[i]]; // S->M + M->S
-                rtt2 = dists_monitors[k][clients[j]] + dists_clients[j][monitors[k]]; // M->C + C->M
-                rtt_min = rtt1 + rtt2;
-                // verifica se rtt* eh menor que o anterior
-                if (rtt_m > rtt_min)
+                rtt1 = distsServers[i][monitors[k]] + distsMonitors[k][servers[i]]; // S->M + M->S
+                rtt2 = distsMonitors[k][clients[j]] + distsClients[j][monitors[k]]; // M->C + C->M
+                rttMin = rtt1 + rtt2;
+                /* verifica se rtt* e menor que oque está armazenado no rttm */
+                if (rttAst > rttMin)
                 {
-                    rtt_m = rtt_min;
+                    rttAst = rttMin;
                 }
             }
 
-            rtt_ratio = rtt_m / rtt_cs;
-            // printf("%d %d %f\n", servers[i], clients[j], rtt_ratio);
+            rttFinal = rttAst / rttSc;
+            // printf("%d %d %f\n", servers[i], clients[j], rttFinal);
 
-            RTT *rtt = CriaRTT(servers[i], clients[j], rtt_ratio);
+            RTT *rtt = CriaRTT(servers[i], clients[j], rttFinal);
 
             lista[count] = *rtt;
+            free(rtt);
             count++;
         }
     }
 
+    /* Ordena a lista de RTT */
     qsort(lista, nServ * nClient, sizeof(RTT), compare);
 
+    /* Libera a memória alocada para as matr izes */
+
+    destroiMatriz(distsServers, nServ);
+    destroiMatriz(distsClients, nClient);
+    destroiMatriz(distsMonitors, nMonitor);
     return lista;
 }
 
@@ -131,16 +145,27 @@ void imprimeListaRTT(FILE *file, RTT *lista, int tam)
     }
 }
 
-double **criaMatriz(Graph *graph, int tam, int *src, int *d1, int *d2, int nd1, int nd2)
+double **criaMatriz(Graph *graph, int tam)
 {
     double **dists = malloc(sizeof(double) * tam);
     for (int i = 0; i < tam; i++)
-    {	
-		dists[i] = ((double*)malloc(tam * sizeof(double)));
-        //dists[i] = dijkstra(graph, src[i], d1, d2, nd1, nd2);
+    {
+        // dists[i] = ((double *)malloc(sizeof(double) * tam));
     }
 
     return dists;
 }
 
+void destroiMatriz(double **matriz, int tam)
+{
+    for (int i = 0; i < tam; i++)
+    {
+        free(matriz[i]);
+    }
+    free(matriz);
+}
 
+void destroiListaRTT(RTT *lista)
+{
+    free(lista);
+}
