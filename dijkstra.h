@@ -1,11 +1,20 @@
-#include "item.h"
-#include "aresta.h"
-#include "PQ.h"
 #ifndef DIJKSTRA_H
 #define DIJKSTRA_H
+#include "graph.h"
+#include "item.h"
 
-void relax(Item** pq, int* N, int* map, Aresta* e, double* distTo, Aresta** edgeTo);
-void dijkstra(int nVert, int *map, int N, Item** listaV, double* distTo,int nEdge, Aresta** edgeTo,Aresta** todasArestas, int ID);
-int PQ_contains(Item** pq, int* N, int ID);
+#include <stdio.h>
+#include <stdlib.h>
+#include <float.h>
+
+/*
+*  Algoritmo de Dijkstra implementado com heap
+*  inputs: um graph, um inteiro indicando a origem, dois ponteiros de inteiro 
+*  indicando os dois grupos (servidores, clientes ou monitores)  e os tamanhos
+*  output: retorna um ponteiro de double com as distancias
+*  pre-condicao: O Graph e os ponteiros de inteiro devem estar devidamente inicializados
+*/
+
+double *dijkstra(Graph *graph, int src);
 
 #endif
